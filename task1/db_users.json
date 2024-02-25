@@ -18,5 +18,17 @@
     "login": "login-53",
     "password": "password-1",
     "token": "d33e3358-c3c1-48b5-a3b5-453300ba9655"
+  },
+  {
+    "firstName": "firstName-2",
+    "lastName": "lastName-1",
+    "login": "login-33",
+    "password": "password-1"
+  },
+  {
+    "firstName": "firstName-2",
+    "lastName": "lastName-1",
+    "login": "login-43",
+    "password": "password-1"
   }
 ]
