@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { authorizationMiddleware } from '../middlewares.js';
-import { ORDERS } from '../db.js';
+import { ADDRESSES, ORDERS } from '../db.js';
 
 export const OrdersRouter = Router();
 
@@ -59,26 +59,62 @@ const convertToDateMiddleware = (fieldName) => (req, res, next) => {
  }
 };
 
+
+const calculateDistance = (lat1, lon1, lat2, lon2) => {
+  const distance = Math.abs(lat1 - lat2) + Math.abs(lon1 - lon2); 
+  return distance;
+}
+
 OrdersRouter.post('/orders', authorizationMiddleware, (req, res) => {
- const { body, user } = req;
+  const { body, user } = req;
 
- const createdAt = new Date();
- createdAt.setHours(2);
- createdAt.setMinutes(0);
- createdAt.setMilliseconds(0);
- createdAt.setSeconds(0);
+  const createdAt = new Date();
+  createdAt.setHours(2);
+  createdAt.setMinutes(0);
+  createdAt.setMilliseconds(0);
+  createdAt.setSeconds(0);
 
- const order = {
-  ...body,
-  login: user.login,
-  createdAt,
-  status: "Active",
-  id: crypto.randomUUID()
- };
+  const fromAddress = ADDRESSES.find(address => address.name === body.from);
+  const toAddress = ADDRESSES.find(address => address.name === body.to);
 
- ORDERS.push(order);
+  if (!fromAddress || !toAddress) {
+      return res.status(400).send({ message: 'The addresses are not valid.' });
+  }
 
- return res.status(200).send({ message: 'Order was created', order });
+  if (!user) {
+      return res.status(400).send({ message: 'User is not found' });
+  }
+
+  const distance = calculateDistance(fromAddress.location.latitude, fromAddress.location.longitude, toAddress.location.latitude, toAddress.location.longitude);
+
+  let price;
+  switch (body.type) {
+      case "standard":
+          price = distance * 2.5;
+          break;
+      case "lite":
+          price = distance * 1.5;
+          break;
+      case "universal":
+          price = distance * 3;
+          break;
+      default:
+          return res.status(400).send({ message: 'Order type is wrong' });
+  }
+
+  const order = {
+      ...body,
+      login: user.login,
+      createdAt,
+      distance: distance + " km",
+      price: "$" + price.toFixed(2),
+      status: "Active",
+      id: crypto.randomUUID(),
+  };
+
+  ORDERS.push(order);
+
+  return res.status(200).send({ message: 'Your order was created', order });
 });
 
 /**

@@ -70,3 +70,4 @@ class DB {
 
 export const USERS = new DB('db_users');
 export const ORDERS = new DB('db_orders');
+export const ADDRESSES = new DB('db_addresses');

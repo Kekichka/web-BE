@@ -5,5 +5,29 @@
     "login": "l1",
     "password": "p1",
     "token": "a245943b-6878-4c7a-8fe2-563c0251f5d9"
+  },
+  {
+    "firstName": "firstName-2",
+    "lastName": "lastName-1",
+    "login": "login-43",
+    "password": "password-1",
+    "token": "2c0dae33-4ca0-445f-a24b-6c912a872357"
+  },
+  {
+    "login": "login-53",
+    "password": "password-67",
+    "role": "Admin"
+  },
+  {
+    "firstName": "firstName-2",
+    "lastName": "lastName-4",
+    "login": "login-63",
+    "password": "password-3",
+    "role": "Customer"
+  },
+  {
+    "login": "login-73",
+    "password": "password-3",
+    "role": "Admin"
   }
 ]
