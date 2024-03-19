@@ -85,6 +85,10 @@ OrdersRouter.post('/orders', authorizationMiddleware, (req, res) => {
       return res.status(400).send({ message: 'User is not found' });
   }
 
+  if (user.role !== 'Customer') {
+    return res.status(403).send({ message: 'User does not have permission to create orders' });
+  }
+
   const distance = calculateDistance(fromAddress.location.latitude, fromAddress.location.longitude, toAddress.location.latitude, toAddress.location.longitude);
 
   let price;
@@ -136,6 +140,17 @@ OrdersRouter.get('/orders', authorizationMiddleware,
 
   let orders = ORDERS.filter(el => el.login === user.login);
 
+
+  if (user.role === 'Driver') {
+    orders = ORDERS.filter(el => el.status === 'Active');
+
+  } else if (user.role === 'Admin') {
+    orders = ORDERS;
+
+  } else {
+    orders = ORDERS.filter(el => el.login === user.login);
+  }
+
   if (query.createdAt) {
 
    try {
@@ -172,11 +187,12 @@ OrdersRouter.get('/orders', authorizationMiddleware,
      .send({ message: err.toString() });
    }
   }
+  
 
   return res.status(200).send(orders);
  });
 
-
+  
 
 /**
  * PATCH /orders/fhsdjkhfkdsj
@@ -186,19 +202,22 @@ OrdersRouter.get('/orders', authorizationMiddleware,
  */
 
 OrdersRouter.patch('/orders/:orderId', (req, res) => {
+  const { params, body, user } = req;
 
- const { params } = req;
+  let order = ORDERS.find(el => el.id === params.orderId);
 
- let order = ORDERS.find(el => el.id === params.orderId);
+ ORDERS.update((el) => el.id === params.orderId, { status: order.status });
 
- if (!order) {
-  return res.status(400).send({ message: `Order with id ${params.orderId} was not found` });
- }
+  if (!order) {
+    return res.status(404).send({ message: `Order with id ${params.orderId} was not found` });
+  }
 
- const { body } = req;
+  if (user && user.role === 'Customer' && order.status === 'Active') {
+  
+    order.status = 'Rejected';
 
- ORDERS.update((el) => el.id === params.orderId, { status: body.status });
+    return res.status(200).send(order);
+  }
 
- order = ORDERS.find(el => el.id === params.orderId);
- return res.status(200).send(order);
+  return res.status(400).send({ message: `Order status cannot be changed` });
 });

@@ -11,23 +11,32 @@
     "lastName": "lastName-1",
     "login": "login-43",
     "password": "password-1",
-    "token": "2c0dae33-4ca0-445f-a24b-6c912a872357"
+    "token": "282b5ec5-894a-4f04-bd35-901a74b06d32"
   },
   {
     "login": "login-53",
     "password": "password-67",
-    "role": "Admin"
+    "role": "Admin",
+    "token": "efb66a9f-e9a2-4533-a522-17cb5204c431"
   },
   {
     "firstName": "firstName-2",
     "lastName": "lastName-4",
     "login": "login-63",
     "password": "password-3",
-    "role": "Customer"
+    "role": "Customer",
+    "token": "e57ad97d-b4ff-4ab5-9b88-6ac1edc2a918"
   },
   {
     "login": "login-73",
     "password": "password-3",
-    "role": "Admin"
+    "role": "Admin",
+    "token": "04a88123-77ee-49bc-8a25-d649888052ac"
+  },
+  {
+    "login": "login-83",
+    "password": "password-3",
+    "role": "Driver",
+    "token": "d97af5a9-629f-445d-9a81-26d7b08cb8a5"
   }
 ]

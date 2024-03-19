@@ -71,7 +71,7 @@ UserRouter.post('/driver', (req, res) => {
   const driverUser = {
       login,
       password,
-      role: 'Admin'
+      role: 'Driver'
   };
 
   USERS.push(driverUser);

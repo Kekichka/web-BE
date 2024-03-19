@@ -60,7 +60,18 @@
     "to": "address - 0",
     "login": "login-43",
     "createdAt": "2024-03-13T00:00:00.000Z",
-    "status": "Active",
+    "status": "Done",
     "id": "d154e561-1cfc-45ea-883b-5b514259c018"
+  },
+  {
+    "from": "address - 1",
+    "to": "address - 0",
+    "type": "standard",
+    "login": "login-63",
+    "createdAt": "2024-03-20T00:00:00.000Z",
+    "distance": "68.0153 km",
+    "price": "$170.04",
+    "status": "Rejected",
+    "id": "d657b011-7b94-4aa5-9889-7bb424578234"
   }
 ]
