@@ -25,7 +25,7 @@
     "login": "login-63",
     "password": "password-3",
     "role": "Customer",
-    "token": "e57ad97d-b4ff-4ab5-9b88-6ac1edc2a918"
+    "token": "0232b267-ae3c-4087-9cb7-272bc785141f"
   },
   {
     "login": "login-73",
@@ -37,6 +37,6 @@
     "login": "login-83",
     "password": "password-3",
     "role": "Driver",
-    "token": "d97af5a9-629f-445d-9a81-26d7b08cb8a5"
+    "token": "dbf5bcf3-9518-4788-879c-02b1d5a1a366"
   }
 ]

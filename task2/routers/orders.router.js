@@ -201,23 +201,84 @@ OrdersRouter.get('/orders', authorizationMiddleware,
  * PATCH /orders/fhsdjkhfkd123sj
  */
 
-OrdersRouter.patch('/orders/:orderId', (req, res) => {
+OrdersRouter.patch('/orders/:orderId',authorizationMiddleware, (req, res) => {
   const { params, body, user } = req;
 
   let order = ORDERS.find(el => el.id === params.orderId);
-
- ORDERS.update((el) => el.id === params.orderId, { status: order.status });
 
   if (!order) {
     return res.status(404).send({ message: `Order with id ${params.orderId} was not found` });
   }
 
-  if (user && user.role === 'Customer' && order.status === 'Active') {
-  
-    order.status = 'Rejected';
-
-    return res.status(200).send(order);
+  if (order.status === 'Done') {
+    return res.status(400).send({ message: `Order status can not be changed` });
+    
   }
+
+  if (user && user.role === 'Customer') {
+
+    if (order.status !== 'Active') {
+      return res.status(400).send({ message: `Order status can not be changed` });
+    }
+
+    if (body.status !== 'Rejected') {
+      return res.status(400).send({ message: `Order status can not be changed` });
+      
+    }
+
+    ORDERS.update((el) => el.id === params.orderId, { status: body.status });
+
+      return res.status(200).send({ message: `Order status changed` });
+  
+  }
+
+  if (user && user.role === 'Driver') {
+
+    if (!['Active', 'In progress'].includes(order.status)) {
+      return res.status(400).send({ message: `Order status can not be changed` });
+    }
+
+    if (order.status=== 'Active' && body.status !== 'In progress') {
+      return res.status(400).send({ message: `Order status can not be changed` });
+      
+    }
+
+    if (order.status == 'In progress' && body.status !== 'Done') {
+      return res.status(400).send({ message: `Order status can not be changed` });
+    }
+
+
+    ORDERS.update((el) => el.id === params.orderId, { status: body.status });
+
+      return res.status(200).send({ message: `Order status changed` });
+
+  
+  }
+
+  if (user && user.role === 'Admin') {
+
+    if (!['Active', 'In progress'].includes(order.status)) {
+      return res.status(400).send({ message: `Order status can not be changed` });
+    }
+
+    if (order.status=== 'Active' && !['Rejected', 'In progress'].includes(body.status)) {
+      return res.status(400).send({ message: `Order status can not be changed` });
+      
+    }
+
+    if (order.status == 'In progress' && body.status !== 'Done') {
+      return res.status(400).send({ message: `Order status can not be changed` });
+    }
+
+
+    ORDERS.update((el) => el.id === params.orderId, { status: body.status });
+
+      return res.status(200).send({ message: `Order status changed` });
+
+  
+  }
+  
+  
 
   return res.status(400).send({ message: `Order status cannot be changed` });
 });
