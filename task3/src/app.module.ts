@@ -10,8 +10,8 @@ import { OrderService } from './service';
 @Module({
   imports: [
     MongooseModule.forRoot(
-      'mongodb+srv://mykola_2024:tfEsXsIfxkgNx6KG@cluster0.z33oori.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0',
-      { dbName: '4CS-11' },
+      'mongodb+srv://katekya:3Q8jufM0y7n3fZYJ@cluster1.jglyg7q.mongodb.net/?retryWrites=true&w=majority&appName=Cluster1',
+      { dbName: 'Cluster1' },
     ),
     MongooseModule.forFeature([
       {
@@ -31,4 +31,9 @@ export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(UserAuthorizationMiddleware).forRoutes('/orders');
   }
+
+  constructor() {
+    console.log('Application initialized. Database connected successfully.');
+  }
 }
+
