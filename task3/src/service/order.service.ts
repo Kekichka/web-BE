@@ -122,7 +122,7 @@ export class OrderService {
   }
 
 
-  async getLast5Fromddresses(login: string): Promise<string[]> {
+  async getLast5FromAddresses(login: string): Promise<string[]> {
     try {
       const orders = await this.orderModel.find({ login }, { from: 1, _id: 0 });
       const differentAddresses = [...new Set(orders.map(order => order.from))];

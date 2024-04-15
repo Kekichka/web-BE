@@ -1,23 +1,23 @@
-import {
-  BadRequestException,
-  Body,
-  Controller,
-  Get,
-  Post,
-  UnauthorizedException,
-  UseGuards,
-  Req
+import { 
+  BadRequestException, 
+  Body, 
+  Controller, 
+  Get, 
+  Post, 
+  UnauthorizedException, 
+  UseGuards, 
+  Req 
 } from '@nestjs/common';
 import { UserService } from '../service';
-import { LoginDto, UserDto,AdminDto, DriverDto } from '../models';
+import { LoginDto, UserDto, AdminDto, DriverDto } from '../models';
 import { UserAlreadyExists, UserNotFound } from '../shared'; 
 import { UserAuthorizationMiddleware } from 'src/midellware/userAuthorization.middleware';
 
-@Controller({ path: '/users' })
+@Controller('users')
 export class UsersController {
   constructor(private readonly userService: UserService) { }
 
-  @Post('/')
+  @Post()
   async createUser(@Body() body: UserDto) {
     try {
       const result = await this.userService.createUser(body);
@@ -30,7 +30,7 @@ export class UsersController {
     }
   }
 
-  @Post('/login')
+  @Post('login')
   async login(@Body() body: LoginDto) {
     try {
       const result = await this.userService.login(body);
@@ -43,24 +43,23 @@ export class UsersController {
     }
   }
 
-  @Get('/')
+  @Get()
   async getAllUsers() {
     return this.userService.getAllUsers();
   }
 }
 
-@Controller({ path: '/admin' })
-  @UseGuards(UserAuthorizationMiddleware) 
-  export class AdminController {
-    constructor(private readonly userService: UserService) {}
+@Controller('admin')
+@UseGuards(UserAuthorizationMiddleware) 
+export class AdminController {
+  constructor(private readonly userService: UserService) {}
 
-  @Post('/')
-  async createAdmin(@Body() body: AdminDto, 
-  @Req() req: Request) {
+  @Post()
+  async createAdmin(@Body() body: AdminDto, @Req() req: Request) {
     const { authorization } = req.headers as any; 
 
     if (authorization !== 'meowmeow77') {
-      throw new UnauthorizedException('Unauthorized access');
+      throw new UnauthorizedException('Authorization error');
     }
 
     try {
@@ -76,11 +75,11 @@ export class UsersController {
   }
 }
 
-@Controller({ path: '/drivers' })
+@Controller('drivers')
 export class DriverController {
   constructor(private readonly userService: UserService) {}
 
-  @Post('/')
+  @Post()
   async createDriver(@Body() body: DriverDto) {
     try {
       body.role = 'Driver'; 

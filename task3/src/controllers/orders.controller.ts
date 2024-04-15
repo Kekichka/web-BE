@@ -1,34 +1,31 @@
-import { Body, Controller, Post, Req, Get,Patch } from '@nestjs/common';
+import { Body, Controller, Get, Patch, Post, Req } from '@nestjs/common';
 import { AddressesService, OrderService } from '../service';
 import { OrderDto } from '../models';
 import { UserLeanDoc } from '../schema';
 
-
-@Controller({ path: '/orders' })
+@Controller('orders')
 export class OrdersController {
-  constructor(private readonly orderService: OrderService  ) {}
-  @Post('/')
+  constructor(private readonly orderService: OrderService) {}
+
+  @Post()
   async createOrder(
     @Body() body: OrderDto,
     @Req() req: Request & { user: UserLeanDoc },
   ) {
     try {
       const { user } = req;
-
-      
-
       const order = await this.orderService.createOrder({
         ...body,
         login: user.login,
       });
-      return  { message: 'Order created successfully', order }
+      return { message: 'Order created successfully', order };
     } catch (err) {
       throw err;
     }
   }
 
-  @Get('/')
-  async getOrders(@Req() req: Request & { user: { login: string, role: string } }) {
+  @Get()
+  async getOrders(@Req() req: Request & { user: { login: string; role: string } }) {
     const { login, role } = req.user;
     return this.orderService.getOrders(login, role);
   }
@@ -36,33 +33,33 @@ export class OrdersController {
   @Patch('/:orderId')
   async updateOrderStatus(
     @Body() body: { status: string },
-    @Req() req: Request & { params: { orderId: string }, user: { role: string } },
+    @Req() req: Request & { params: { orderId: string }; user: { role: string } },
   ) {
     try {
       const { params, user } = req;
-      const result = await this.orderService.updateOrderStatus(params.orderId, body.status, user.role);
-      
+      const result = await this.orderService.updateOrderStatus(
+        params.orderId,
+        body.status,
+        user.role,
+      );
       return result;
     } catch (err) {
       throw err;
     }
   }
 
-  
-  @Get('/addresses/from/last-5')
-  async getLast5Fromddresses(@Req() req: Request & { user: UserLeanDoc }) {
+  @Get('addresses/from/last-5')
+  async getLast5FromAddresses(@Req() req: Request & { user: UserLeanDoc }) {
     try {
       const { user } = req;
-      const last5Addresses = await this.orderService.getLast5Fromddresses(user.login);
+      const last5Addresses = await this.orderService.getLast5FromAddresses(user.login);
       return last5Addresses;
     } catch (err) {
       throw err;
     }
   }
 
- 
-
-  @Get('/addresses/to/last-3')
+  @Get('addresses/to/last-3')
   async getLast3ToAddresses(@Req() req: Request & { user: UserLeanDoc }) {
     try {
       const { user } = req;
@@ -73,7 +70,7 @@ export class OrdersController {
     }
   }
 
-  @Get('/lowest')
+  @Get('lowest')
   async getLowestPriceOrder(@Req() req: Request & { user: UserLeanDoc }) {
     try {
       const { user } = req;
@@ -84,8 +81,7 @@ export class OrdersController {
     }
   }
 
-
-  @Get('/biggest')
+  @Get('biggest')
   async getBiggestPriceOrder(@Req() req: Request & { user: UserLeanDoc }) {
     try {
       const { user } = req;
@@ -95,5 +91,4 @@ export class OrdersController {
       throw err;
     }
   }
-
-  }
+}
