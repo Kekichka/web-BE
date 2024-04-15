@@ -1,13 +1,4 @@
-import { 
-  BadRequestException, 
-  Body, 
-  Controller, 
-  Get, 
-  Post, 
-  UnauthorizedException, 
-  UseGuards, 
-  Req 
-} from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Post, UnauthorizedException, UseGuards, Req } from '@nestjs/common';
 import { UserService } from '../service';
 import { LoginDto, UserDto, AdminDto, DriverDto } from '../models';
 import { UserAlreadyExists, UserNotFound } from '../shared'; 
