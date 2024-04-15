@@ -9,8 +9,17 @@ export class Orders {
   @Prop({ type: String, required: true })
   to: string;
 
-  @Prop({ type: Number, required: true })
-  price: number;
+  @Prop({ type: Number, required: false })
+  price?: number;
+
+  @Prop({ type: Number, required: false })
+  distance?: number;
+  
+  @Prop({ type: String, required: false })
+  type?: string;
+
+  @Prop({ type: String, required: false })
+  status?: string;
 
   @Prop({ type: String, required: true })
   login: string;

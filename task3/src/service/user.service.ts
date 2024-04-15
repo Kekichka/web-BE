@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { LoginDto, UserDto } from '../models';
-import { UserDoc, Users } from '../schema';
+import { LoginDto, UserDto,DriverDto,AdminDto } from '../models';
+import { UserDoc, Users} from '../schema';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { UserAlreadyExists, UserNotFound } from '../shared';
@@ -18,15 +18,18 @@ export class UserService {
       login: body.login,
     });
 
+
     if (isExists) {
       throw new UserAlreadyExists(
         `User with login ${body.login} already exists`,
       );
     }
 
+
     /**
      * Validation of data
      */
+    body.role = 'Customer';
     const doc = new this.userModel(body);
     /**
      * Save to db
@@ -60,5 +63,41 @@ export class UserService {
     );
 
     return users.map((user) => user.toObject());
+  }
+
+  async createAdmin(body: AdminDto) {
+    const isExists = await this.userModel.findOne({
+      login: body.login,
+    });
+
+    if (isExists) {
+      throw new UserAlreadyExists(
+        `User with login ${body.login} already exists`,
+      );
+    }
+
+    body.role = 'Admin';
+    const doc = new this.userModel(body);
+    const admin = await doc.save();
+
+    return admin.toObject();
+  }
+
+  async createDriver(body: DriverDto) {
+    const isExists = await this.userModel.findOne({
+      login: body.login,
+    });
+
+    if (isExists) {
+      throw new UserAlreadyExists(
+        `User with login ${body.login} already exists`,
+      );
+    }
+
+    body.role = 'Driver';
+    const doc = new this.userModel(body);
+    const driver = await doc.save();
+
+    return driver.toObject();
   }
 }
