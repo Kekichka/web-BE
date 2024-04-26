@@ -1,15 +1,18 @@
-import { BadRequestException, Body, Controller, Get, Post, UnauthorizedException, UseGuards, Req } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Post } from '@nestjs/common';
 import { UserService } from '../service';
-import { LoginDto, UserDto, AdminDto, DriverDto } from '../models';
-import { UserAlreadyExists, UserNotFound } from '../shared'; 
-import { UserAuthorizationMiddleware } from 'src/midellware/userAuthorization.middleware';
+import { LoginDto, UserDto } from '../models';
+import { UserAlreadyExists, UserNotFound } from '../shared';
 
-@Controller ('users')
+@Controller('users')
 export class UsersController {
-  constructor(private readonly userService: UserService) { }
+  constructor(private readonly userService: UserService) {}
 
-  @Post ()
-  async createUser (@Body() body: UserDto) {
+  @Post()
+  async createUser(@Body() body: UserDto) {
+    if (!body.email || !body.password) {
+      throw new BadRequestException('Email and password are required');
+    }
+
     try {
       const result = await this.userService.createUser(body);
       return result;
@@ -21,63 +24,17 @@ export class UsersController {
     }
   }
 
-  @Post ('login')
+  @Post('login')
   async login(@Body() body: LoginDto) {
+    if (!body.email || !body.password) {
+      throw new BadRequestException('Email and password are required');
+    }
+
     try {
       const result = await this.userService.login(body);
-      return { token: result };
+      return { result };
     } catch (err) {
       if (err instanceof UserNotFound) {
-        throw new BadRequestException(err.message);
-      }
-      throw err;
-    }
-  }
-
-  @Get()
-  async getAllUsers() {
-    return this.userService.getAllUsers();
-  }
-}
-
-@Controller('admin')
-@UseGuards(UserAuthorizationMiddleware) 
-export class AdminController {
-  constructor(private readonly userService: UserService) {}
-
-  @Post()
-  async createAdmin(@Body() body: AdminDto, @Req() req: Request) {
-    const { authorization } = req.headers as any; 
-
-    if (authorization !== 'meowmeow77') {
-      throw new UnauthorizedException('Authorization error');
-    }
-
-    try {
-      body.role = 'Admin'; 
-      const result = await this.userService.createAdmin(body);
-      return result;
-    } catch (err) {
-      if (err instanceof UserAlreadyExists) {
-        throw new BadRequestException(err.message);
-      }
-      throw err;
-    }
-  }
-}
-
-@Controller('drivers')
-export class DriverController {
-  constructor(private readonly userService: UserService) {}
-
-  @Post()
-  async createDriver(@Body() body: DriverDto) {
-    try {
-      body.role = 'Driver'; 
-      const result = await this.userService.createDriver(body);
-      return result;
-    } catch (err) {
-      if (err instanceof UserAlreadyExists) {
         throw new BadRequestException(err.message);
       }
       throw err;

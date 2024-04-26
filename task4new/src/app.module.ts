@@ -1,25 +1,24 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
-import { AdminController, DriverController, UsersController } from './controllers/users.controller';
-import { UserService } from './service';
+import { UsersController } from './controllers/users.controller';
+import { LinksService, UserService } from './service';
 import { MongooseModule } from '@nestjs/mongoose';
-import { Addresses, AddressesSchema, Orders, OrdersSchema, UserSchema, Users } from './schema';
+import { UserSchema, Users } from './schema';
 import { UserAuthorizationMiddleware } from './midellware/userAuthorization.middleware';
-import { AddressesService, OrderService } from './service';
+import { LinksController } from './controllers/links.contoller';
 
 @Module({
   imports: [
     MongooseModule.forRoot(
-      'mongodb+srv://katekya:3Q8jufM0y7n3fZYJ@cluster1.jglyg7q.mongodb.net/Cluster1',
-      { dbName: 'Cluster1' },
+      'mongodb+srv://katekya:aTG633DYxp0GBhJI@lab4.hv8gbof.mongodb.net/?retryWrites=true&w=majority&appName=Lab4',
+      { dbName: 'Meow' },
     ),
     MongooseModule.forFeature([
       { name: Users.name, schema: UserSchema },
-      { name: Orders.name, schema: OrdersSchema },
-      { name: Addresses.name, schema: AddressesSchema }
+
     ]),
   ],
-  controllers: [UsersController, AdminController, DriverController],
-  providers: [UserService, OrderService, AddressesService],
+  controllers: [UsersController,LinksController],
+  providers: [UserService, LinksService ],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
