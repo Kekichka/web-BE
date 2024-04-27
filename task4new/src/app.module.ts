@@ -2,7 +2,7 @@ import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { UsersController } from './controllers/users.controller';
 import { LinksService, UserService } from './service';
 import { MongooseModule } from '@nestjs/mongoose';
-import { UserSchema, Users } from './schema';
+import { Links, LinksSchema, UserSchema, Users } from './schema';
 import { UserAuthorizationMiddleware } from './midellware/userAuthorization.middleware';
 import { LinksController } from './controllers/links.contoller';
 
@@ -14,6 +14,7 @@ import { LinksController } from './controllers/links.contoller';
     ),
     MongooseModule.forFeature([
       { name: Users.name, schema: UserSchema },
+      { name: Links.name, schema: LinksSchema }
 
     ]),
   ],
