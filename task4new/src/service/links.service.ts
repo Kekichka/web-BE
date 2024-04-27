@@ -1,23 +1,25 @@
 import { Injectable } from '@nestjs/common';
-import { v4 as uuidv4 } from 'uuid';
 import { CreateLinkDto } from '../models';
+import { LinksDoc, Links } from '../schema';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 
 @Injectable()
 export class LinksService {
-  private readonly links = [];
+  constructor(
+    @InjectModel(Links.name)
+    private readonly linksModel: Model<LinksDoc>,
+  ) {}
 
-  createLink(createLinkDto: CreateLinkDto) {
-    const linkId = uuidv4();
-    const { originalLink, shortLink, expiredAt } = createLinkDto;
+  async createLink( body:CreateLinkDto ) {
 
-    const link = {
-      linkId,
-      originalLink,
-      shortLink,
-      expiredAt,
-    };
+    const link = new this.linksModel( {
+      originalLink : body.originalLink,
+      shortLink : body.shortLink,
+      expiredAt : body.expiredAt
+    } ) ;
 
-    this.links.push(link);
-    return link;
+    const createdLink = await link.save();
+    return createdLink;
   }
 }

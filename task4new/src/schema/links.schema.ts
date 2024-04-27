@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Types, Document } from 'mongoose';
 
+@Schema({ collection: 'Links' })
 export class Links {
   @Prop({ type: String, required: true })
   originalLink: string;
