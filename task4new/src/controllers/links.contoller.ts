@@ -1,6 +1,7 @@
-import { BadRequestException, Body, Controller, Post, Headers, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Headers, NotFoundException, Param, Post, Query, Res, UnauthorizedException } from '@nestjs/common';
 import { LinksService } from '../service';
 import { CreateLinkDto } from '../models';
+import { LinksDoc } from '../schema';
 
 @Controller({ path: '/link' })
 export class LinksController {
@@ -17,7 +18,7 @@ export class LinksController {
     expiredAt.setDate(expiredAt.getDate() + 5);
 
     try {
-      const createdLink = await this.linksService.createLink({
+      const createdLink = await this.linksService.createLink(apiKey, {
         originalLink: body.originalLink,
         shortLink,
         expiredAt,
@@ -29,6 +30,23 @@ export class LinksController {
     }
   }
 
+  @Get('/links')
+async GetLinks(
+  @Headers('authorization') apiKey: string,
+  @Query('expiredAt[gt]') gtExpiredAt: Date,
+  @Query('expiredAt[lt]') ltExpiredAt: Date,
+): Promise<any> {
+  if (!apiKey) {
+    throw new UnauthorizedException('User is not authorized');
+  }
+
+  try {
+    return await this.linksService.getLinks(apiKey, gtExpiredAt, ltExpiredAt);
+  } catch (error) {
+    throw new BadRequestException('Failed to retrieve links');
+  }
+}
+
   private generateShortLink(): string {
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     let shortLink = '';
@@ -36,5 +54,29 @@ export class LinksController {
       shortLink += characters.charAt(Math.floor(Math.random() * characters.length));
     }
     return shortLink;
+  }
+
+  @Get('shortLink/:cut')
+  async handleRedirect(@Res() res, @Param('cut') cut: string) {
+    try {
+
+      const shortLink = await this.linksService.getOriginalLink( cut);
+
+      if (!shortLink) {
+        throw new NotFoundException('Short link was not found');
+      }
+
+      if (shortLink.expiredAt && shortLink.expiredAt < new Date()) {
+        throw new NotFoundException('Link was expired');
+      }
+
+      res.redirect(shortLink.originalLink);
+    } catch (err) {
+      if (err instanceof UnauthorizedException || err instanceof NotFoundException) {
+        throw err;
+      } else {
+        throw new BadRequestException('Failed to redirect');
+      }
+    }
   }
 }

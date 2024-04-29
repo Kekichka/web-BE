@@ -11,6 +11,9 @@ export class Links {
 
   @Prop({ type: Date, required: true })
   expiredAt: Date;
+
+  @Prop({ required: true })
+  apiKey: string;
 }
 
 export const LinksSchema = SchemaFactory.createForClass(Links);
