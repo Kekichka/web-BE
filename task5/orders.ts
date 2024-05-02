@@ -86,3 +86,4 @@ export const getOrdersByQuery = (query: OrdersQuery): Order[] => {
 
   return orders.filter((order) => conditions.some((check) => check(order)));
 };
+
