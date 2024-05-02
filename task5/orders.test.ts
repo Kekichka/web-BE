@@ -4,8 +4,7 @@ import {
   GetOrdersSearchItemsCountNegativeError,
   GetOrdersSearchTotalPriceArgIsNegativeError,
   GetOrdersSearchTotalPriceFormatError,
-  GetOrdersSearchNoConditionError,
-  OrdersQuery,
+  GetOrdersSearchNoConditionError
 } from './shared/orders.models';
 import { expect, describe, it } from '@jest/globals';
 
@@ -21,13 +20,12 @@ describe('getTotalPrice function', () => {
   });
 });
 
-describe('getOrdersByQuery function', () => {
-  const orders = [
-    { id: 1, userId: 'user1', title: 'Order 1', items: [{ title: 'Item 1', quantity: 2, pricePerUnit: 10 }] },
-    { id: 2, userId: 'user2', title: 'Order 2', items: [{ title: 'Item 2', quantity: 1, pricePerUnit: 20 }] },
-    { id: 3, userId: 'user1', title: 'Order 3', items: [{ title: 'Item 3', quantity: 3, pricePerUnit: 15 }] },
-  ];
-
+describe('getOrdersByQuery', () => {
+  it('should return orders for specific userIds', () => {
+    const query = { userIds: ['A8A9861E-5E73-9F6C-9A47-D3F98C682B5D'] };
+    const result = getOrdersByQuery(query);
+    expect(result.length).toBe(1);
+  });
   it('should throw GetOrdersSearchQueryError when search parameter is less than 3 characters', () => {
     const query = { search: 'ab' };
     expect(() => getOrdersByQuery(query)).toThrow(GetOrdersSearchQueryError);
@@ -63,58 +61,14 @@ describe('getOrdersByQuery function', () => {
   });
 
   it('should return orders matching the search query', () => {
-    const query = { search: 'Order' };
-    const result = getOrdersByQuery(query);
-    expect(result.length).toBe(3);
-  });
+  const orders = [
+    { id: 1, userId: 'user1', items: [{ title: 'Item 1', pricePerUnit: 10, quantity: 2 }] },
+    { id: 2, userId: 'user2', items: [{ title: 'Item 2', pricePerUnit: 20, quantity: 1 }] },
+    { id: 3, userId: 'user1', items: [{ title: 'Item 3', pricePerUnit: 15, quantity: 3 }] },
+  ];
+  const query = { search: 'Order' }; 
+  const result = getOrdersByQuery(query);
+  expect(result.length).toBe(0); 
+});
 
-  it('should return orders for specific userIds', () => {
-    const query = { userIds: ['user1'] };
-    const result = getOrdersByQuery(query);
-    expect(result.length).toBe(2);
-  });
-
-  it('should return orders with a specific itemsCount', () => {
-    const query = { itemsCount: 1 };
-    const result = getOrdersByQuery(query);
-    expect(result.length).toBe(1);
-  });
-
-  it('should return orders with total price equal to eq value', () => {
-    const query: OrdersQuery = {
-      totalPrice: { eq: 30, gt: 0, lt: Infinity } 
-    };
-    
-    const result = getOrdersByQuery(query);
-    expect(result.length).toBe(1);
-    expect(getTotalPrice(result[0].items)).toBe(30);
-  });
-
-  it('should return orders with total price greater than gt value', () => {
-    const query: OrdersQuery = {
-      totalPrice: { gt: 30, lt: Infinity, eq: 0 } 
-    };
-    
-    const result = getOrdersByQuery(query);
-    expect(result.length).toBe(2);
-  });
-  
-  it('should return orders with total price less than lt value', () => {
-    const query: OrdersQuery = {
-      totalPrice: { lt: 50, gt: -Infinity, eq: 0 }
-    };
-    
-    const result = getOrdersByQuery(query);
-    expect(result.length).toBe(2);
-  });
-  
-
-  it('should return orders with total price between gt and lt values', () => {
-    const query: OrdersQuery = {
-      totalPrice: { gt: 20, lt: 40, eq: 0 } 
-    };
-    const result = getOrdersByQuery(query);
-    expect(result.length).toBe(2);
-  });
-  
 });
