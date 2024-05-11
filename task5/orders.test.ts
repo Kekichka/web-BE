@@ -38,7 +38,7 @@ describe('getOrdersByQuery', () => {
 
   it('should throw GetOrdersSearchTotalPriceArgIsNegativeError when eq argument is negative', () => {
     const query = { totalPrice: { eq: -1, gt: 0, lt: 0 } }; 
-    expect(() => getOrdersByQuery(query)).toThrow(GetOrdersSearchTotalPriceArgIsNegativeError);
+    expect(() => getOrdersByQuery(query)).toThrowError(new GetOrdersSearchTotalPriceArgIsNegativeError('eq'));
   });
   it('should throw GetOrdersSearchTotalPriceArgIsNegativeError when gt argument is negative', () => {
     const query = { totalPrice:  { eq: 0, gt: -1, lt: 0 } };
