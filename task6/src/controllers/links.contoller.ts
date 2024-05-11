@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Get, Headers, NotFoundException, Param, Post, Query, Res, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Headers, NotFoundException, Param, Post, UnauthorizedException } from '@nestjs/common';
 import { BooksService } from '../service'; 
 import { CreateBookDto } from '../models';
 import { BookDoc } from '../schema'; 
@@ -37,5 +37,4 @@ export class BooksController {
       throw new BadRequestException('Failed to retrieve books');
     }
   }
-
 }

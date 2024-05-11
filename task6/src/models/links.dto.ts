@@ -14,3 +14,18 @@ export class CreateBookDto {
   @IsUrl({}, { each: true }) 
   pageLinks: string[];
 }
+export class RandomPartDto {
+  @ApiProperty({ description: 'Image URL', type: String })
+  imageUrl: string;
+
+  @ApiProperty({ description: 'One-time password', type: String })
+  otp: string;
+
+  @ApiProperty({ description: 'Box information', type: Object })
+  box: {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  };
+}
