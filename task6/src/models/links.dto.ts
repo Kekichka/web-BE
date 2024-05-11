@@ -10,7 +10,7 @@ export class CreateBookDto {
   @ApiProperty({ description: 'Array of page links for the book', type: [String] })
   @IsArray()
   @ArrayNotEmpty()
-  @IsString({ each: true }) // Ensure each page link is a string
-  @IsUrl({}, { each: true }) // Validate each page link as URL
+  @IsString({ each: true }) 
+  @IsUrl({}, { each: true }) 
   pageLinks: string[];
 }

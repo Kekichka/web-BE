@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateBookDto } from '../models';
-import { BookDoc, Book } from '../schema'; // Assuming you have a Book schema
+import { BookDoc, Book } from '../schema'; 
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
@@ -27,7 +27,5 @@ export class BooksService {
 
     return this.bookModel.find(query).exec();
   }
-
-  // You might want to add more methods here for specific book operations
 
 }

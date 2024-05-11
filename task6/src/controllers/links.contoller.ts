@@ -1,9 +1,9 @@
 import { BadRequestException, Body, Controller, Get, Headers, NotFoundException, Param, Post, Query, Res, UnauthorizedException } from '@nestjs/common';
-import { BooksService } from '../service'; // Assuming you have a BooksService
-import { CreateBookDto } from '../models'; // Assuming you have a CreateBookDto
-import { BookDoc } from '../schema'; // Assuming you have a Book schema
+import { BooksService } from '../service'; 
+import { CreateBookDto } from '../models';
+import { BookDoc } from '../schema'; 
 
-@Controller({ path: '/books' }) // Changed path to '/books'
+@Controller({ path: '/books' }) 
 export class BooksController {
   constructor(private readonly booksService: BooksService) {}
 
@@ -37,6 +37,5 @@ export class BooksController {
       throw new BadRequestException('Failed to retrieve books');
     }
   }
-
 
 }

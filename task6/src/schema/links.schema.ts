@@ -1,15 +1,15 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Types, Document } from 'mongoose';
 
-@Schema({ collection: 'Books' }) // Assuming your collection name for books is 'Books'
+@Schema({ collection: 'Books' }) 
 export class Book {
   @Prop({ type: String, required: true })
   title: string;
 
-  @Prop({ type: [{ type: String }] }) // Assuming pageLinks is an array of strings
+  @Prop({ type: [{ type: String }] }) 
   pageLinks: string[];
 
-  @Prop({ type: Date, default: Date.now }) // Assuming you want to store creation date
+  @Prop({ type: Date, default: Date.now })
   createdAt: Date;
 
   @Prop({ required: true })
