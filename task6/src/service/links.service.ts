@@ -1,60 +1,33 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { CreateLinkDto } from '../models';
-import { LinksDoc, Links } from '../schema';
+import { CreateBookDto } from '../models';
+import { BookDoc, Book } from '../schema'; // Assuming you have a Book schema
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
 @Injectable()
-export class LinksService {
+export class BooksService {
   constructor(
-    @InjectModel(Links.name)
-    private readonly linksModel: Model<LinksDoc>,
+    @InjectModel(Book.name)
+    private readonly bookModel: Model<BookDoc>,
   ) {}
 
-  async createLink(apiKey: string, body: CreateLinkDto) {
-    const link = new this.linksModel({
-      originalLink: body.originalLink,
-      shortLink: body.shortLink,
-      expiredAt: body.expiredAt,
+  async createBook(apiKey: string, body: CreateBookDto): Promise<BookDoc> {
+    const book = new this.bookModel({
+      title: body.title,
+      pageLinks: body.pageLinks,
       apiKey: apiKey,
     });
 
-    const createdLink = await link.save();
-    return createdLink;
+    const createdBook = await book.save();
+    return createdBook;
   }
 
-  async getLinks(apiKey: string, gtExpiredAt?: Date, ltExpiredAt?: Date): Promise<LinksDoc[]> {
-    let query: any = { apiKey };
+  async getBooks(apiKey: string): Promise<BookDoc[]> {
+    const query: any = { apiKey };
 
-    if (gtExpiredAt && ltExpiredAt) {
-      query = {
-        ...query,
-        expiredAt: {
-          $gt: gtExpiredAt,
-          $lt: ltExpiredAt,
-        },
-      };
-    } else if (gtExpiredAt) {
-      query = {
-        ...query,
-        expiredAt: {
-          $gt: gtExpiredAt,
-        },
-      };
-    } else if (ltExpiredAt) {
-      query = {
-        ...query,
-        expiredAt: {
-          $lt: ltExpiredAt,
-        },
-      };
-    }
+    return this.bookModel.find(query).exec();
+  }
 
-    return this.linksModel.find(query).exec();
-  }
-  async getOriginalLink(cut: string): Promise<any> {
-    const link = await this.linksModel.findOne({shortLink: cut }).exec();
-    return link; 
-  }
-  
+  // You might want to add more methods here for specific book operations
+
 }

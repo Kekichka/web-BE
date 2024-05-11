@@ -1,22 +1,16 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsNotEmpty, IsUrl, IsOptional } from 'class-validator';
+import { IsString, IsNotEmpty, IsArray, ArrayNotEmpty, IsUrl, IsDateString } from 'class-validator';
 
-export class CreateLinkDto {
-  @ApiProperty({ description: 'Original link to be shortened', type: String })
+export class CreateBookDto {
+  @ApiProperty({ description: 'Title of the book', type: String })
   @IsString()
   @IsNotEmpty()
-  @IsUrl()
-  originalLink: string;
+  title: string;
 
-  @ApiProperty({ description: 'Shortened link to be shortened', type: String })
-  @IsNotEmpty()
-  @IsOptional()
-  @IsUrl()
-  shortLink: string;
-
-  @ApiProperty({ description: 'Expiration date of the shortened link', type: Date })
-  @IsOptional()
-  @IsNotEmpty()
-  expiredAt: Date;
+  @ApiProperty({ description: 'Array of page links for the book', type: [String] })
+  @IsArray()
+  @ArrayNotEmpty()
+  @IsString({ each: true }) // Ensure each page link is a string
+  @IsUrl({}, { each: true }) // Validate each page link as URL
+  pageLinks: string[];
 }
-
