@@ -1,18 +1,17 @@
 import { Controller, Get, InternalServerErrorException } from '@nestjs/common';
-import { RandomPartDto } from '../models'; // Import the RandomPartDto
-import { PartsService } from '../service'; // Import the PartsService
+import { RandomPartDto } from '../models';
+import { PartsService } from '../service'; 
 
-@Controller('parts') // Corrected to 'parts'
+@Controller('parts') 
 export class PartsController {
   constructor(private readonly partsService: PartsService) {}
 
-  @Get() // Removed redundant route path
+  @Get() 
   async getRandomPart(): Promise<RandomPartDto> {
     try {
-      // Generate a random OTP
+      
       const otp = this.generateOTP();
 
-      // Retrieve a random part
       const randomPart = await this.partsService.getRandomPart();
 
       return {
@@ -26,7 +25,6 @@ export class PartsController {
   }
 
   private generateOTP(): string {
-    // Generate a random string as OTP (you can use any method you prefer)
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     const otpLength = 6;
     let otp = '';
