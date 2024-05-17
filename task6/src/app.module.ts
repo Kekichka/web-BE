@@ -4,8 +4,10 @@ import { BooksService , PartsService, UserService } from './service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { BookSchema, Book , UserSchema, Users } from './schema';
 import { UserAuthorizationMiddleware } from './midellware/userAuthorization.middleware';
-import { BooksController} from './controllers/links.contoller';
+import { BooksController} from './controllers/books.contoller';
 import { PartsController } from './controllers/parts.controller';
+import { Part, PartSchema } from './schema/parts.schema';
+import { MulterModule } from '@nestjs/platform-express';
 
 @Module({
   imports: [
@@ -16,6 +18,8 @@ import { PartsController } from './controllers/parts.controller';
     MongooseModule.forFeature([
       { name: Users.name, schema: UserSchema },
       { name: Book.name, schema: BookSchema },
+      { name: Part.name, schema: PartSchema },
+      
     ]),
   ],
   controllers: [UsersController, BooksController, PartsController],

@@ -1,3 +1,4 @@
 export * from './users.schema';
-export * from './links.schema';
+export * from './books.schema';
+export * from './parts.schema';
 
