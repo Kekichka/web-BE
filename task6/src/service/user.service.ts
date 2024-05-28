@@ -1,10 +1,11 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
-import { LoginDto, UserDto } from '../models';
-import { UserDoc, Users } from '../schema';
+import { Injectable } from '@nestjs/common';
+import { LoginDto, UserDto} from '../models';
+import { UserDoc, Users} from '../schema';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { UserAlreadyExists, UserNotFound } from '../shared';
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from 'uuid'; 
+import { randomUUID } from 'crypto';
 
 @Injectable()
 export class UserService {
@@ -15,18 +16,17 @@ export class UserService {
 
   async createUser(body: UserDto) {
     const isExists = await this.userModel.findOne({
-      login: body.email,
+      login: body.login,
     });
+
 
     if (isExists) {
       throw new UserAlreadyExists(
-        `This email: ${body.email} is already in use`,
+        `This login:${body.login} already in use`,
       );
     }
 
-    const apiKey = uuidv4();
-
-    const doc = new this.userModel({ ...body, apiKey: apiKey });
+    const doc = new this.userModel(body);
 
     const user = await doc.save();
 
@@ -35,14 +35,19 @@ export class UserService {
 
   async login(body: LoginDto) {
     const user = await this.userModel.findOne({
-      email: body.email,
+      login: body.login,
       password: body.password,
     });
 
     if (!user) {
-      throw new BadRequestException(`User with login ${body.email} was not found`);
+      throw new UserNotFound(`User with login ${body.login} was not found`);
     }
-   
-    return { email:user.email, password:user.password, message:'USERS LOGIN DATA'};
+
+    user.token = randomUUID();
+
+    await user.save();
+
+    return user.token;
   }
+
 }

@@ -1,41 +1,98 @@
-import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
+import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { Model } from 'mongoose';
-import { Part } from '../schema';
+import { InjectModel } from '@nestjs/mongoose';
+import { PartAccessTokenDoc, Parts, PartsDoc } from '../schema';
+import { PartAccessToken } from '../schema';
+import { Pictures, PicturesDoc } from '../schema';
+import axios from 'axios';
+import Jimp from 'jimp';
 
 @Injectable()
 export class PartsService {
-  private partAccessTokens: { [key: string]: string } = {};
+  constructor(
+    @InjectModel(Parts.name)
+    private readonly partsModel: Model<PartsDoc>,
+    @InjectModel(PartAccessToken.name)
+    private readonly partAccessTokenModel: Model<PartAccessTokenDoc>,
+    @InjectModel(Pictures.name)
+    private readonly picturesModel: Model<PicturesDoc>,
+  ) {}
 
-  constructor(@InjectModel(Part.name) private partModel: Model<Part>) {}
+  
+  async generateRandomPartFromLink(imageUrl: string, picturesId: string): Promise<any> {
+    try {
+      const response = await axios.get(imageUrl, { responseType: 'arraybuffer' });
+      const imageBuffer = Buffer.from(response.data, 'binary');
+      const image = await Jimp.read(imageBuffer);
+
+      const randomPart = {
+        imageUrl,
+        picturesId,
+        otp: await this.generateOTP(),
+        box: {
+          x: Math.random() * image.bitmap.width,
+          y: Math.random() * image.bitmap.height,
+          width: Math.random() * image.bitmap.width,
+          height: Math.random() * image.bitmap.height,
+        },
+      };
+
+      const savedPart = await this.partsModel.create(randomPart);
+
+      const accessToken = {
+        key: savedPart.otp,
+        partId: savedPart._id.toString(),
+      };
+
+      await this.partAccessTokenModel.create(accessToken);
+
+      return {
+        imageUrl: savedPart.imageUrl,
+        otp: savedPart.otp,
+        box: savedPart.box,
+      };
+    } catch (error) {
+      console.error(`Error generating random part from link: ${error.message}`);
+      throw new BadRequestException('Failed to generate random part from link');
+    }
+  }
+
+  async generateOTP(): Promise<string> {
+    const length = 6;
+    const characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    let OTP = '';
+    for (let i = 0; i < length; i++) {
+      OTP += characters.charAt(Math.floor(Math.random() * characters.length));
+    }
+    return OTP;
+  }
 
   async getRandomPart(): Promise<any> {
-    // Generate a random part with an OTP
-    const part = {
-      imageUrl: 'http://example.com/image.jpg',
-      otp: Math.random().toString(36).substring(7),
-      box: {
-        x: 0,
-        y: 0,
-        width: 100,
-        height: 100,
-      },
-    };
-    this.partAccessTokens[part.otp] = part.otp;  // Using OTP as key for simplicity
-    return part;
+    try {
+      const count = await this.picturesModel.countDocuments();
+      if (count === 0) {
+        throw new BadRequestException('No pictures found');
+      }
+
+      const randomIndex = Math.floor(Math.random() * count);
+      const randomPicture = await this.picturesModel.findOne().skip(randomIndex).exec();
+
+      if (!randomPicture) {
+        throw new BadRequestException('No picture found');
+      }
+
+      return await this.generateRandomPartFromLink(randomPicture.url, randomPicture._id.toString());
+    } catch (err) {
+      console.error(`Failed to generate part: ${err.message}`);
+      throw new BadRequestException('Failed to generate part from provided link');
+    }
   }
 
-  verifyOtp(partId: string, otp: string): boolean {
-    return this.partAccessTokens[otp] === partId;
-  }
-
-  removeOtp(otp: string): void {
-    delete this.partAccessTokens[otp];
-  }
-
-  saveText(partId: string, text: string): void {
-    // Logic to save text associated with the partId
-    // This can be an update to the Part document in the database
-    console.log(`Saving text for part ${partId}: ${text}`);
+  async verifyOtpAndDelete(partId: string, otp: string): Promise<void> {
+    const accessToken = await this.partAccessTokenModel.findOne({ partId, key: otp }).exec();
+    if (!accessToken) {
+      throw new NotFoundException('Invalid OTP or Part ID');
+    }
+    await this.partAccessTokenModel.deleteOne({ _id: accessToken._id }).exec();
   }
 }

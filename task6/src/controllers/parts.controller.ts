@@ -1,29 +1,31 @@
-import { Controller, Get, Post, Param, Body, BadRequestException } from '@nestjs/common';
-import { PartsService } from '../service';
-import { SubmitPartDto } from '../models';
+import { BadRequestException, Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { PartsService } from '../service/parts.service';
 
 @Controller('parts')
 export class PartsController {
   constructor(private readonly partsService: PartsService) {}
 
-  @Get()
-  getRandomPart() {
-    return this.partsService.getRandomPart();
+  @Get('/')
+  async getRandomPart(): Promise<any> {
+    try {
+      const randomPart = await this.partsService.getRandomPart();
+      return randomPart;
+    } catch (error) {
+      console.error(`Error generating part: ${error.message}`);
+      throw new BadRequestException('Failed to generate part');
+    }
   }
 
-  @Post('/:_id')
-  submitPartText(@Param('id') id: string, @Body() submitPartDto: SubmitPartDto) {
-    const { text, otp } = submitPartDto;
-    const isOtpValid = this.partsService.verifyOtp(id, otp);
-
-    this.partsService.removeOtp(otp);
-
-    if (!isOtpValid) {
-      throw new BadRequestException('Invalid OTP');
+  @Post('/:id')
+  async verifyOtpAndDelete(
+    @Param('id') partId: string,
+    @Body() body: { text: string, otp: string },
+  ): Promise<void> {
+    try {
+      await this.partsService.verifyOtpAndDelete(partId, body.otp);
+    } catch (error) {
+      console.error(`Error verifying OTP: ${error.message}`);
+      throw new BadRequestException(error.message || 'Failed to verify OTP');
     }
-
-    this.partsService.saveText(id, text);
-    return { message: 'Text saved successfully' };
   }
 }
-
