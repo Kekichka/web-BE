@@ -1,32 +1,11 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import configuration from './config/configuration';
-import { TelegramService } from './services/telegram.service';
-import { TelegramController } from 'controllers/telegram.controller';
 import { MongooseModule } from '@nestjs/mongoose';
-import { Links, LinksSchema, Users, UsersSchema } from 'models';
+import { BotModule } from './bot/bot.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      load: [configuration],
-    }),
-    MongooseModule.forRootAsync({
-      imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => ({
-        uri: configService.get<string>('mongodbUrl'),
-        dbName: 'PriceTracker'
-      }),
-      inject: [ConfigService],
-    }),
-    MongooseModule.forFeature([
-      { name: Users.name, schema: UsersSchema },
-      { name: Links.name, schema: LinksSchema },
-    ])
+    MongooseModule.forRoot('mongodb+srv://mynameseriy:bw66fv5wwKJx7djz@tg.0jd2kdu.mongodb.net/?retryWrites=true&w=majority&appName=tg'),
+    BotModule,
   ],
-  controllers: [AppController, TelegramController],
-  providers: [AppService, TelegramService],
 })
-export class AppModule { }
+export class AppModule {}
